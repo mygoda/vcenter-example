@@ -121,19 +121,24 @@ def do_reconfig():
 
     print("get all vm .......")
     all_vm = []
+
     for vm in vms:
-        vm_name = vm.name
-        print("now vm is %s" % vm_name)
+        try:
+            vm_name = vm.name
+            print("now vm is %s" % vm_name)
 
-        is_problem_vm, device = filter_problem_vm(vm_obj=vm)
+            is_problem_vm, device = filter_problem_vm(vm_obj=vm)
 
-        if is_problem_vm:
-            print("vm %s has more than 1 serial port" % vm_name)
-            #dev_conf = change_serialport_config(device=device)
-            #reconfig_vm(vm_obj=vm, dev_conf=dev_conf)
-            all_vm.append(vm_name)
-        else:
-            print("vm %s is nomal port count is %s" % (vm_name, device))
+            if is_problem_vm:
+                print("vm %s has more than 1 serial port" % vm_name)
+                #dev_conf = change_serialport_config(device=device)
+                #reconfig_vm(vm_obj=vm, dev_conf=dev_conf)
+                all_vm.append(vm_name)
+            else:
+                print("vm %s is nomal port count is %s" % (vm_name, device))
+        except Exception as e:
+            continue
+        
     return all_vm
 
 if __name__ == "__main__":
