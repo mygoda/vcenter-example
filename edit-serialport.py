@@ -3,7 +3,10 @@
 
 from __future__ import division, unicode_literals, print_function
 # 与 vcenter 交互相关的操作
-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+import os
 from pyVim.connect import SmartConnect
 from pyVmomi import vmodl, vim
 import time
@@ -11,11 +14,11 @@ import ssl
 CONTEXT = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 CONTEXT.verify_mode = ssl.CERT_NONE
 
-HOST = ""
+HOST = os.getenv("host", "")
 
-PWD = ""
+PWD = os.getenv("pwd", "")
 
-USERNAME = ""
+USERNAME = os.getenv("username", "")
 
 
 def connect_vcenter(host, username, password, port=443):
@@ -117,7 +120,7 @@ def do_reconfig():
     vms = get_objs(content, [vim.VirtualMachine])
 
     print("get all vm .......")
-
+    all_vm = []
     for vm in vms:
         vm_name = vm.name
         print("now vm is %s" % vm_name)
@@ -126,15 +129,20 @@ def do_reconfig():
 
         if is_problem_vm:
             print("vm %s has more than 1 serial port" % vm_name)
-            dev_conf = change_serialport_config(device=device)
-            reconfig_vm(vm_obj=vm, dev_conf=dev_conf)
+            #dev_conf = change_serialport_config(device=device)
+            #reconfig_vm(vm_obj=vm, dev_conf=dev_conf)
+            all_vm.append(vm_name)
         else:
             print("vm %s is nomal port count is %s" % (vm_name, device))
-
+    return all_vm
 
 if __name__ == "__main__":
     print("start do work....")
-    do_reconfig()
+    print("*" * 30)
+    all_vms = do_reconfig()
+    print(len(all_vms))
+    for all_vm in all_vms:
+        print(all_vm)
     print("end")
 
 
